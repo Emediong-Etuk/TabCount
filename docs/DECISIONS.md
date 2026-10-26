@@ -12,3 +12,10 @@ Deviations from the original spec, and why. Newest last.
 | 6 | Annotation text is ASCII: `x2` instead of `×2`, and `|` instead of `·` in the banner. The banner is drawn in a strip *above* the image. | OpenCV Hershey fonts only render ASCII. The strip keeps tablets near the top edge visible. |
 | 7 | Imports: the repo root is put on `sys.path` by `pytest.ini` (`pythonpath = .`) for tests, and by a two-line bootstrap at the top of each `scripts/*.py` file, so `python scripts/x.py` works from the repo root. | One obvious way to run each script, on every OS, no packaging step. |
 | 8 | Labels CSV has a 7th column `source` (`real`/`synthetic`) after the six specified columns. | Lets real and synthetic results stay clearly separated in every output. |
+| 9 | Docker base image is `public.ecr.aws/docker/library/python:3.12-slim` (the official Docker image mirrored on AWS ECR Public) instead of `python:3.12-slim` from Docker Hub. | Docker Hub returned 429 (rate limit) during the build check; shared EC2 IPs hit the same limit. Same image, multi-arch. |
+| 10 | No extra system packages in the image. | `opencv-python-headless` 5.0.0.93 imports cleanly on `python:3.12-slim`; verified by a build-time `import cv2` assertion. |
+| 11 | uvicorn runs with `--no-access-log`. | Access logs contain client IP addresses; the spec forbids logging personal data. Our own JSON line per request is the only request log. |
+| 12 | `deploy.py` runs Docker with `sudo` on the instance. | Avoids depending on the `docker` group membership taking effect in the first SSH session after boot. |
+| 13 | EC2 root volume is 16 GB gp3, encrypted. | The 8 GB default is tight for the Docker build cache plus the image (~600 MB). |
+| 14 | `GET /api/results/{id}` probes dated S3 prefixes (today back to 60 days), with an in-memory cache of recent IDs. | The least-privilege role has no `s3:ListBucket`, and keys are date-partitioned as specified. |
+| 15 | Key pair type ED25519; written with LF line endings. | Supported by AWS and Windows OpenSSH; avoids CRLF issues on Windows. `provision.py` also runs the `icacls` commands on Windows. |

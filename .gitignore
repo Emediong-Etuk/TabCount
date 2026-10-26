@@ -8,7 +8,7 @@ __pycache__/
 # Secrets — never commit
 .env
 *.pem
-deploy/state.json
+deploy/state*.json
 
 # Generated data (reproducible with --seed)
 eval/data/synthetic/
