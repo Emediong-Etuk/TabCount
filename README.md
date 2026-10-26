@@ -141,7 +141,7 @@ Protocol: peak_ratio swept over [0.3, 0.4, 0.5, 0.6, 0.7] on the tune split only
 
 ## Quickstart (local)
 
-Requires Python 3.12 (3.11 also works). Commands are given for **Windows PowerShell** and **macOS/Linux**.
+Requires Python 3.12, 3.13 or 3.14 (not 3.11: the pinned numpy 2.5.4 needs 3.12+). Commands are given for **Windows PowerShell** and **macOS/Linux**.
 
 ```powershell
 # Windows PowerShell

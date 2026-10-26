@@ -19,3 +19,4 @@ Deviations from the original spec, and why. Newest last.
 | 13 | EC2 root volume is 16 GB gp3, encrypted. | The 8 GB default is tight for the Docker build cache plus the image (~600 MB). |
 | 14 | `GET /api/results/{id}` probes dated S3 prefixes (today back to 60 days), with an in-memory cache of recent IDs. | The least-privilege role has no `s3:ListBucket`, and keys are date-partitioned as specified. |
 | 15 | Key pair type ED25519; written with LF line endings. | Supported by AWS and Windows OpenSSH; avoids CRLF issues on Windows. `provision.py` also runs the `icacls` commands on Windows. |
+| 16 | Supported Python: 3.12–3.14 (Docker uses 3.12). 3.11 is **not** supported. | `numpy==2.5.4` (resolved by OpenCV 5.0.0.93) has no 3.11 wheels. Windows wheels verified for 3.12, 3.13, 3.14 (`opencv-python-headless` is an abi3 wheel). |
