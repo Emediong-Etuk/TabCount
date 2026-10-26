@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TabCount</title>
+<meta name="description" content="Count tablets in a photo. OpenCV 5 on AWS.">
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --ink: #14181f; --muted: #5b6472; --line: #e3e6eb;
+    --accent: #0b6e4f; --accent-ink: #ffffff; --warn-bg: #fff4e5; --warn-ink: #8a4b00;
+    --high: #0b6e4f; --medium: #b26a00; --low: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1216; --card: #171b21; --ink: #e8ebef; --muted: #9aa3af; --line: #2a3039;
+            --accent: #3fb68b; --accent-ink: #06130e; --warn-bg: #2b2112; --warn-ink: #ffcf8a;
+            --high: #3fb68b; --medium: #f0a733; --low: #ff7a70; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 16px; }
+  header { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 14px; }
+  .wordmark { font-weight: 800; font-size: 28px; letter-spacing: -0.5px; }
+  .wordmark span { color: var(--accent); }
+  .tag { color: var(--muted); font-size: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+  .buttons { display: grid; gap: 10px; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px;
+         border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; border: 2px solid var(--accent);
+         background: var(--card); color: var(--accent); user-select: none; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); }
+  .btn input { display: none; }
+  .hint { color: var(--muted); font-size: 14px; margin: 10px 2px 0; }
+  .spinner { display: none; align-items: center; gap: 12px; justify-content: center; padding: 18px; }
+  .spinner.on { display: flex; }
+  .spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent);
+          animation: s 0.8s linear infinite; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  #result { display: none; }
+  .count-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .count { font-size: 64px; font-weight: 800; line-height: 1; }
+  .count small { font-size: 18px; font-weight: 600; color: var(--muted); margin-left: 6px; }
+  .badge { padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 14px; color: #fff; text-transform: uppercase; letter-spacing: .5px; }
+  .badge.high { background: var(--high); } .badge.medium { background: var(--medium); } .badge.low { background: var(--low); }
+  .warns { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; }
+  .warns li { background: var(--warn-bg); color: var(--warn-ink); border-radius: 10px; padding: 10px 12px; font-size: 15px; }
+  .annotated { display: block; width: 100%; height: auto; border-radius: 10px; margin-top: 14px; border: 1px solid var(--line); }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 10px; word-break: break-word; }
+  .baseline { margin-top: 10px; font-size: 15px; }
+  .error { display: none; background: var(--warn-bg); color: var(--low); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-weight: 600; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details ul { margin: 10px 0 0; padding-left: 20px; }
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin: 18px 0 8px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="wordmark">Tab<span>Count</span></div>
+    <div class="tag">count tablets from a photo</div>
+  </header>
+
+  <section class="card">
+    <div class="buttons">
+      <label class="btn primary">Take photo
+        <input id="cam" type="file" accept="image/*" capture="environment">
+      </label>
+      <label class="btn">Choose from gallery
+        <input id="gal" type="file" accept="image/*">
+      </label>
+    </div>
+    <p class="hint">Spread tablets in a single layer on a plain, contrasting surface, then shoot from straight above.</p>
+  </section>
+
+  <div class="error" id="error" role="alert"></div>
+
+  <div class="card spinner" id="spinner" aria-live="polite"><div class="spin"></div><div>Counting…</div></div>
+
+  <section class="card" id="result" aria-live="polite">
+    <div class="count-row">
+      <div class="count" id="count">0<small>tablets</small></div>
+      <div class="badge" id="badge">high</div>
+    </div>
+    <ul class="warns" id="warns"></ul>
+    <a id="imgLink" target="_blank" rel="noopener"><img class="annotated" id="annotated" alt="Annotated photo with every tablet outlined and numbered"></a>
+    <div class="baseline" id="baseline"></div>
+    <div class="meta" id="meta"></div>
+    <div class="meta" id="rid"></div>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>Tips for accurate counts</summary>
+      <ul>
+        <li>One tablet type per photo.</li>
+        <li>A single layer only: no tablets on top of others.</li>
+        <li>A plain background that contrasts with the tablets (dark cloth for white tablets, white paper for coloured ones).</li>
+        <li>Hold the phone straight above, about 20–30 cm away.</li>
+        <li>No flash, and avoid glare from lamps or windows.</li>
+      </ul>
+    </details>
+  </section>
+
+  <footer>TabCount is a counting aid. Always verify counts before dispensing.<br><span id="health"></span></footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var health = null;
+  var lastUrl = null;
+
+  fetch("/health").then(function (r) { return r.json(); }).then(function (h) {
+    health = h;
+    $("health").textContent = "OpenCV " + h.opencv_version + " · " + h.arch +
+      (h.instance_type ? " · AWS EC2 " + h.instance_type : "");
+  }).catch(function () {});
+
+  function plural(n, one, many) { return n === 1 ? one : many; }
+
+  function explain(d) {
+    var out = [];
+    (d.warnings || []).forEach(function (w) {
+      if (w === "no_tablets_found") out.push("No tablets found. Use a plain background that contrasts with the tablets.");
+      else if (w === "low_contrast_or_background_not_detected") out.push("Low contrast: the background could not be separated from the tablets. Try a darker or lighter surface.");
+      else if (w === "background_region_detected") out.push("Part of the background was mistaken for tablets (uneven light or a patterned surface). Retake on a plain surface with even light.");
+      else out.push(w);
+    });
+    if (d.clusters_flagged > 0) {
+      out.push(d.clusters_flagged + " " + plural(d.clusters_flagged, "spot may be", "spots may be") +
+        " touching or stacked tablets. Check the orange outlines; the count includes an estimate for " +
+        plural(d.clusters_flagged, "it", "them") + ".");
+    }
+    if (d.confidence === "low" && out.length === 0) out.push("Low confidence: count by hand to confirm.");
+    if (d.debris_removed > 0) out.push(d.debris_removed + " small " + plural(d.debris_removed, "fragment was", "fragments were") + " ignored as crumbs.");
+    return out;
+  }
+
+  function showError(msg) {
+    $("error").textContent = msg;
+    $("error").style.display = "block";
+  }
+
+  function downscale(file) {
+    // Draw to a canvas, longest side <= 1600 px, export JPEG q=0.9.
+    // Speeds up uploads on mobile data and converts HEIC to JPEG.
+    return new Promise(function (resolve) {
+      try {
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function () {
+          try {
+            var max = 1600, w = img.naturalWidth, h = img.naturalHeight;
+            var s = Math.min(1, max / Math.max(w, h));
+            var c = document.createElement("canvas");
+            c.width = Math.round(w * s); c.height = Math.round(h * s);
+            c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+            URL.revokeObjectURL(url);
+            c.toBlob(function (b) { resolve(b || file); }, "image/jpeg", 0.9);
+          } catch (e) { resolve(file); }
+        };
+        img.onerror = function () { URL.revokeObjectURL(url); resolve(file); };
+        img.src = url;
+      } catch (e) { resolve(file); }
+    });
+  }
+
+  function handle(input) {
+    var file = input.files && input.files[0];
+    input.value = "";
+    if (!file) return;
+    $("error").style.display = "none";
+    $("result").style.display = "none";
+    $("spinner").classList.add("on");
+    var t0 = performance.now();
+    downscale(file).then(function (blob) {
+      var fd = new FormData();
+      fd.append("file", blob, "photo.jpg");
+      return fetch("/api/count", { method: "POST", body: fd });
+    }).then(function (r) {
+      return r.json().then(function (d) { return { ok: r.ok, d: d }; });
+    }).then(function (res) {
+      $("spinner").classList.remove("on");
+      if (!res.ok) { showError((res.d && res.d.error) || "Something went wrong."); return; }
+      render(res.d, performance.now() - t0);
+    }).catch(function () {
+      $("spinner").classList.remove("on");
+      showError("Upload failed. Check your connection and try again.");
+    });
+  }
+
+  function render(d, roundTrip) {
+    $("count").innerHTML = "";
+    $("count").appendChild(document.createTextNode(String(d.count)));
+    var sm = document.createElement("small"); sm.textContent = plural(d.count, "tablet", "tablets");
+    $("count").appendChild(sm);
+    var b = $("badge"); b.className = "badge " + d.confidence; b.textContent = d.confidence + " confidence";
+    var ul = $("warns"); ul.innerHTML = "";
+    explain(d).forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+    if (lastUrl) URL.revokeObjectURL(lastUrl);
+    var bytes = atob(d.annotated_jpeg_b64), arr = new Uint8Array(bytes.length);
+    for (var i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    lastUrl = URL.createObjectURL(new Blob([arr], { type: "image/jpeg" }));
+    $("annotated").src = lastUrl; $("imgLink").href = lastUrl;
+    $("baseline").textContent = "Naive contour count: " + d.baseline_count +
+      (d.baseline_count !== d.segments ? " (touching tablets merged; watershed separated them)" : "");
+    var where = health && health.instance_type ? "AWS EC2 " + health.instance_type + " (" + d.arch + ")" : d.arch;
+    $("meta").textContent = "Processed in " + Math.round(d.timings_ms.total) + " ms on " + where +
+      " · OpenCV " + d.opencv_version + " · round trip " + Math.round(roundTrip) + " ms";
+    $("rid").textContent = "Request ID: " + d.request_id;
+    $("result").style.display = "block";
+    $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  $("cam").addEventListener("change", function () { handle(this); });
+  $("gal").addEventListener("change", function () { handle(this); });
+})();
+</script>
+</body>
+</html>

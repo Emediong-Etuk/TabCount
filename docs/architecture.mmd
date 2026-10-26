@@ -1,0 +1,37 @@
+flowchart TB
+    user["Phone browser<br/>index.html · resize to 1600 px JPEG"]
+    evalc["Eval & benchmark scripts<br/>run_eval.py --url · benchmark.py"]
+
+    subgraph AWS["AWS · eu-west-1"]
+        subgraph EC2["Amazon EC2 t4g.small · Graviton arm64 · Amazon Linux 2023 · Elastic IP · IMDSv2 hop limit 2"]
+            subgraph DOCKER["Docker container 'tabcount' · port 80 → 8000"]
+                api["FastAPI + uvicorn<br/>POST /api/count · GET /health"]
+                subgraph CV["OpenCV 5 pipeline · app/counter.py"]
+                    direction LR
+                    p1["Decode + resize"] --> p2["Gray · blur ·<br/>flatten light"] --> p3["Otsu +<br/>polarity"] --> p4["Morphology +<br/>hole fill"] --> p5["Distance<br/>transform"] --> p6["Per-blob<br/>seeds"] --> p7["Watershed"] --> p8["Area / debris /<br/>cluster check"] --> p9["Annotate"]
+                end
+                api <--> CV
+            end
+        end
+        role["IAM role tabcount-ec2-role<br/>least privilege"]
+        s3[("Amazon S3 · private<br/>input · annotated.jpg · result.json<br/>SSE-S3 · 60-day expiry")]
+        cw["Amazon CloudWatch Logs<br/>/tabcount/app · JSON per request"]
+    end
+
+    user -- "HTTP POST photo / JSON result" --> api
+    evalc -- HTTP --> api
+    api -- "BackgroundTask PutObject" --> s3
+    DOCKER -- "awslogs driver" --> cw
+    role -. "credentials via IMDSv2" .-> EC2
+
+    classDef aws fill:#fff4e5,stroke:#e47911,color:#232f3e,stroke-width:2px
+    classDef cv fill:#e8f1fd,stroke:#2a78d6,color:#0b2a4f
+    classDef app fill:#eef7f1,stroke:#0b6e4f,color:#0b2a1f
+    classDef client fill:#f4f4f2,stroke:#52514e,color:#0b0b0b
+    class s3,cw,role aws
+    class p1,p2,p3,p4,p5,p6,p7,p8,p9 cv
+    class api app
+    class user,evalc client
+    style CV fill:#e8f1fd,stroke:#2a78d6,stroke-width:2px
+    style EC2 fill:#fff4e5,stroke:#e47911
+    style AWS fill:#fffaf2,stroke:#e47911,stroke-width:2px

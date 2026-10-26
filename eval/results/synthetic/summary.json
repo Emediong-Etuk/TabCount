@@ -1,0 +1,347 @@
+{
+  "dataset": "synthetic",
+  "data_label": "SYNTHETIC",
+  "n_images": 200,
+  "n_tune": 67,
+  "n_test": 133,
+  "split_note": null,
+  "protocol": "peak_ratio swept over [0.3, 0.4, 0.5, 0.6, 0.7] on the tune split only; best by MAE; headline metrics on the test split only. Default params = deployed system.",
+  "default_params": {
+    "max_side": 1200,
+    "blur_ksize": 5,
+    "close_iterations": 1,
+    "open_iterations": 2,
+    "peak_ratio": 0.5,
+    "min_area_px": 60,
+    "debris_ratio": 0.25,
+    "cluster_ratio": 1.8,
+    "cluster_correction": true,
+    "flatten_background": true
+  },
+  "tuned_peak_ratio": 0.6,
+  "sweep_tune": {
+    "0.3": {
+      "n": 67,
+      "exact_acc": 0.6716,
+      "within1_acc": 0.7164,
+      "mae": 4.761,
+      "mape_pct": 14.79,
+      "bias": -4.761
+    },
+    "0.4": {
+      "n": 67,
+      "exact_acc": 0.9104,
+      "within1_acc": 0.9552,
+      "mae": 0.701,
+      "mape_pct": 2.44,
+      "bias": -0.701
+    },
+    "0.5": {
+      "n": 67,
+      "exact_acc": 0.9851,
+      "within1_acc": 1.0,
+      "mae": 0.015,
+      "mape_pct": 0.03,
+      "bias": -0.015
+    },
+    "0.6": {
+      "n": 67,
+      "exact_acc": 1.0,
+      "within1_acc": 1.0,
+      "mae": 0.0,
+      "mape_pct": 0.0,
+      "bias": 0.0
+    },
+    "0.7": {
+      "n": 67,
+      "exact_acc": 1.0,
+      "within1_acc": 1.0,
+      "mae": 0.0,
+      "mape_pct": 0.0,
+      "bias": 0.0
+    }
+  },
+  "test": {
+    "watershed": {
+      "n": 133,
+      "exact_acc": 0.9774,
+      "within1_acc": 0.9925,
+      "mae": 0.045,
+      "mape_pct": 0.09,
+      "bias": -0.045
+    },
+    "watershed_no_cluster": {
+      "n": 133,
+      "exact_acc": 0.7895,
+      "within1_acc": 0.8195,
+      "mae": 1.203,
+      "mape_pct": 3.06,
+      "bias": -1.203
+    },
+    "baseline": {
+      "n": 133,
+      "exact_acc": 0.2932,
+      "within1_acc": 0.3008,
+      "mae": 12.211,
+      "mape_pct": 34.88,
+      "bias": -12.211
+    },
+    "watershed_tuned": {
+      "n": 133,
+      "exact_acc": 1.0,
+      "within1_acc": 1.0,
+      "mae": 0.0,
+      "mape_pct": 0.0,
+      "bias": 0.0
+    }
+  },
+  "all_images": {
+    "watershed": {
+      "n": 200,
+      "exact_acc": 0.98,
+      "within1_acc": 0.995,
+      "mae": 0.035,
+      "mape_pct": 0.07,
+      "bias": -0.035
+    },
+    "watershed_no_cluster": {
+      "n": 200,
+      "exact_acc": 0.795,
+      "within1_acc": 0.82,
+      "mae": 1.155,
+      "mape_pct": 3.18,
+      "bias": -1.155
+    },
+    "baseline": {
+      "n": 200,
+      "exact_acc": 0.315,
+      "within1_acc": 0.32,
+      "mae": 11.725,
+      "mape_pct": 34.15,
+      "bias": -11.725
+    },
+    "watershed_tuned": {
+      "n": 200,
+      "exact_acc": 1.0,
+      "within1_acc": 1.0,
+      "mae": 0.0,
+      "mape_pct": 0.0,
+      "bias": 0.0
+    }
+  },
+  "by_condition_test": {
+    "mixed": {
+      "watershed": {
+        "n": 44,
+        "exact_acc": 0.9773,
+        "within1_acc": 1.0,
+        "mae": 0.023,
+        "mape_pct": 0.06,
+        "bias": -0.023
+      },
+      "watershed_no_cluster": {
+        "n": 44,
+        "exact_acc": 0.7273,
+        "within1_acc": 0.75,
+        "mae": 1.136,
+        "mape_pct": 3.7,
+        "bias": -1.136
+      },
+      "baseline": {
+        "n": 44,
+        "exact_acc": 0.0,
+        "within1_acc": 0.0227,
+        "mae": 11.432,
+        "mape_pct": 32.35,
+        "bias": -11.432
+      },
+      "watershed_tuned": {
+        "n": 44,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      }
+    },
+    "separated": {
+      "watershed": {
+        "n": 39,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      },
+      "watershed_no_cluster": {
+        "n": 39,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      },
+      "baseline": {
+        "n": 39,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      },
+      "watershed_tuned": {
+        "n": 39,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      }
+    },
+    "touching": {
+      "watershed": {
+        "n": 50,
+        "exact_acc": 0.96,
+        "within1_acc": 0.98,
+        "mae": 0.1,
+        "mape_pct": 0.19,
+        "bias": -0.1
+      },
+      "watershed_no_cluster": {
+        "n": 50,
+        "exact_acc": 0.68,
+        "within1_acc": 0.74,
+        "mae": 2.2,
+        "mape_pct": 4.89,
+        "bias": -2.2
+      },
+      "baseline": {
+        "n": 50,
+        "exact_acc": 0.0,
+        "within1_acc": 0.0,
+        "mae": 22.42,
+        "mape_pct": 64.3,
+        "bias": -22.42
+      },
+      "watershed_tuned": {
+        "n": 50,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      }
+    }
+  },
+  "by_background_test": {
+    "dark": {
+      "watershed": {
+        "n": 56,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      },
+      "watershed_no_cluster": {
+        "n": 56,
+        "exact_acc": 0.8929,
+        "within1_acc": 0.9286,
+        "mae": 0.5,
+        "mape_pct": 1.46,
+        "bias": -0.5
+      },
+      "baseline": {
+        "n": 56,
+        "exact_acc": 0.2679,
+        "within1_acc": 0.2679,
+        "mae": 13.161,
+        "mape_pct": 38.85,
+        "bias": -13.161
+      },
+      "watershed_tuned": {
+        "n": 56,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      }
+    },
+    "light": {
+      "watershed": {
+        "n": 77,
+        "exact_acc": 0.961,
+        "within1_acc": 0.987,
+        "mae": 0.078,
+        "mape_pct": 0.16,
+        "bias": -0.078
+      },
+      "watershed_no_cluster": {
+        "n": 77,
+        "exact_acc": 0.7143,
+        "within1_acc": 0.7403,
+        "mae": 1.714,
+        "mape_pct": 4.23,
+        "bias": -1.714
+      },
+      "baseline": {
+        "n": 77,
+        "exact_acc": 0.3117,
+        "within1_acc": 0.3247,
+        "mae": 11.519,
+        "mape_pct": 31.98,
+        "bias": -11.519
+      },
+      "watershed_tuned": {
+        "n": 77,
+        "exact_acc": 1.0,
+        "within1_acc": 1.0,
+        "mae": 0.0,
+        "mape_pct": 0.0,
+        "bias": 0.0
+      }
+    }
+  },
+  "latency_ms": {
+    "p50": 78.0,
+    "p95": 99.7,
+    "max": 216.2,
+    "note": "server-side pipeline time (timings_ms.total), local machine"
+  },
+  "machine": {
+    "arch": "x86_64",
+    "opencv_version": "5.0.0"
+  },
+  "confidence_counts_test": {
+    "high": 105,
+    "medium": 14,
+    "low": 14
+  },
+  "accuracy_by_confidence_test": {
+    "high": {
+      "n": 105,
+      "exact_acc": 1.0,
+      "within1_acc": 1.0,
+      "mae": 0.0,
+      "mape_pct": 0.0,
+      "bias": 0.0
+    },
+    "medium": {
+      "n": 14,
+      "exact_acc": 1.0,
+      "within1_acc": 1.0,
+      "mae": 0.0,
+      "mape_pct": 0.0,
+      "bias": 0.0
+    },
+    "low": {
+      "n": 14,
+      "exact_acc": 0.7857,
+      "within1_acc": 0.9286,
+      "mae": 0.429,
+      "mape_pct": 0.86,
+      "bias": -0.429
+    }
+  }
+}

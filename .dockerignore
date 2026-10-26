@@ -1,0 +1,13 @@
+.git
+.gitignore
+.venv
+eval/
+docs/
+tests/
+scripts/
+tools/
+deploy/
+*.pem
+.env
+**/__pycache__
+.pytest_cache

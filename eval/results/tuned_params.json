@@ -1,0 +1,9 @@
+{
+  "synthetic": {
+    "peak_ratio": 0.6,
+    "default_peak_ratio": 0.5,
+    "tune_mae_best": 0.0,
+    "tune_mae_default": 0.015,
+    "note": "NOT applied to the code default; human decision required."
+  }
+}
