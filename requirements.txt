@@ -1,0 +1,8 @@
+# Runtime dependencies (exact pins from pip freeze; full tree in requirements.lock.txt)
+# OpenCV 5 — the ONLY OpenCV package. Never add opencv-python or contrib.
+opencv-python-headless==5.0.0.93
+numpy==2.5.4
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+python-multipart==0.0.32
+boto3==1.43.118
