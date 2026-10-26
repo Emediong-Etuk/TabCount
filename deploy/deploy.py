@@ -28,6 +28,13 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 sys.path.insert(0, str(ROOT))
 
+try:
+    import numpy  # noqa: F401  (needed for the smoke test at the end)
+except ModuleNotFoundError:
+    raise SystemExit("Dependencies missing for this Python. Use the project venv (PowerShell):\n"
+                     "  .venv\\Scripts\\python.exe -m pip install -r requirements-dev.txt\n"
+                     "  .venv\\Scripts\\python.exe deploy/deploy.py --host IP --key tabcount-key.pem")
+
 ALWAYS_EXCLUDE = ["deploy/state.json", "*.pem", ".env", ".venv", ".git", "**/__pycache__"]
 
 

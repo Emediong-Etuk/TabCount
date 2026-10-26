@@ -27,8 +27,15 @@ import time
 import urllib.request
 from pathlib import Path
 
-import boto3
-from botocore.exceptions import ClientError
+try:
+    import boto3
+    from botocore.exceptions import ClientError
+except ModuleNotFoundError:
+    raise SystemExit(
+        "boto3 is not installed for this Python. Use the project venv (PowerShell):\n"
+        "  py -3.12 -m venv .venv\n"
+        "  .venv\\Scripts\\python.exe -m pip install -r requirements-dev.txt\n"
+        "  .venv\\Scripts\\python.exe " + __file__.replace("\\", "/").split("/")[-2] + "/" + __file__.replace("\\", "/").split("/")[-1] + " ...")
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent

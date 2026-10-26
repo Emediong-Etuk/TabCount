@@ -2,6 +2,14 @@
 
 Deadline: **Tue Oct 27, 07:59 WAT** (Mon Oct 26, 11:59 PM Pacific). Commands are PowerShell.
 
+**Step 0, once:** create the venv and install everything. Run every `python ...` command below with the venv's
+Python: activate it first, or replace `python` with `.venv\Scripts\python.exe`.
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass; .venv\Scripts\Activate.ps1   # optional
+```
+
 1. [ ] **Devpost:** confirm the team is registered on the competition page and start a draft submission now.
 2. [ ] **Photos:** shoot ≥ 30 photos per `eval/PHOTO_PROTOCOL.md`, copy them to one folder, then:
    ```powershell
